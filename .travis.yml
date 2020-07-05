@@ -1,0 +1,43 @@
+git:
+  depth: false
+
+env:
+  global:
+    - PROJECT_NAME=go-docker
+
+os: linux
+
+dist: trusty
+
+sudo: false
+
+language: go
+
+go:
+  - 1.14.x
+
+stages:
+  - name: build-pr
+    if: branch IN (master) AND type IN (pull_request)
+
+  - name: build-push
+    if: branch IN (master) AND type IN (push) AND tag IS present
+
+jobs:
+  include:
+    - stage: build-pr
+      name: "Build and test pull request"
+      script:
+        - echo "Building and running tests"
+        - go test -v ./...
+
+    - stage: test
+      name: "Build and test push, then publish to Docker Hub"
+      script:
+        - echo "Building and running tests"
+        - go test -v ./...
+        - echo "Publishing Docker image to Docker Hub"
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker build -t $PROJECT_NAME .
+        - docker tag $PROJECT_NAME $DOCKER_USERNAME/$PROJECT_NAME:$TRAVIS_TAG
+        - docker push $DOCKER_USERNAME/$PROJECT_NAME:$TRAVIS_TAG
