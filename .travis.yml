@@ -20,8 +20,8 @@ stages:
   - name: build-pr
     if: branch IN (master) AND type IN (pull_request)
 
-  - name: build-push
-    if: branch IN (master) AND type IN (push) AND tag IS present
+  - name: build-tag
+    if: branch IN (master) AND type NOT IN (pull_request) AND tag IS present
 
 jobs:
   include:
@@ -31,7 +31,7 @@ jobs:
         - echo "Building and running tests"
         - go test -v ./...
 
-    - stage: build-push
+    - stage: build-tag
       name: "Build and test push, then publish to Docker Hub"
       script:
         - echo "Building and running tests"
