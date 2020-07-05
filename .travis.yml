@@ -31,7 +31,7 @@ jobs:
         - echo "Building and running tests"
         - go test -v ./...
 
-    - stage: build-push
+    - stage: build-tag
       name: "Build and test push, then publish to Docker Hub"
       script:
         - echo "Building and running tests"
